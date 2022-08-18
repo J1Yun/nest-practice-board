@@ -21,19 +21,27 @@ import { CreateBoardDto } from './dto/create-board.dto';
 @Controller('boards')
 @UseGuards(AuthGuard())
 export class BoardsController {
-  private logger = new Logger('BoardsController');
+  private logger = new Logger('Board');
   constructor(private boardsService: BoardsService) {}
 
   // 특정 게시물 조회
   @Get('/:id')
   getBoardById(@GetUser() user: User, @Param('id') id: number): Promise<Board> {
-    console.log(user);
+    this.logger.verbose(`User ${user.username} trying to get board ${id}`);
     return this.boardsService.getBoardById(id);
   }
 
   // 게시물 생성
   @Post()
-  createBoard(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
+  createBoard(
+    @GetUser() user: User,
+    @Body() createBoardDto: CreateBoardDto,
+  ): Promise<Board> {
+    this.logger.verbose(
+      `User ${user.username} creating a new board. Payload: ${JSON.stringify(
+        createBoardDto,
+      )}`,
+    );
     return this.boardsService.createBoard(createBoardDto);
   }
 
